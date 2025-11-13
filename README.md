@@ -1,1 +1,1 @@
-# SO2
+# Tarea 2 Sistemas Operativos
