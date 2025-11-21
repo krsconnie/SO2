@@ -8,51 +8,65 @@
 #include <stdbool.h>
 
 /*
-Marco para la memoria física
-npv: nº página virtual
-refBit: Bit de referencia
+Struct Marco para la memoria física
+	npv: nº página virtual almacenada en el marco, si esta vacía guarda -1.
+	refBit: Bit de referencia de acceso.
 */
-typedef struct {
+typedef struct Marco {
 	
 	int npv;
 	int refBit;
 
 } Marco;
 
-
 /*
-Tabla de paginación (TdP)
-
+Struct Tabla de paginación (TdP) 
+	valido: indica si la página esta cargada en memoria.
+	nMarco: número de marco donde se encuentra la página,si y solo si valido == true. 
 */
-typedef struct {
+typedef struct TdP {
 
 	bool valido;
-	bool modificado;
+	// bool modificado; // puede que no sea necesario mirando los obj de la tarea
 	int nMarco;	
 
 } TdP; 
 
 
-typedef struct {
-	
-	Marco *memoriaFisica;
-	TdP *tablaPag;
-	int nMarcos;
-	int tamPag;
-	int b;
-	unsigned int mask;
-	int relojAux;
-	int verbose; // el enunciado dice que es opcional, si me funciona lo dejo :D
+/*
+Struct Sim(ulador)
+	Contiene los elementos principales para la simulación,
+	lo explico línea a línea porque sale más corto
+*/
 
-	long long referencias;
+typedef struct Sim {
+	
+	Marco *memoriaFisica; 		// Memoria ram simulada
+	TdP *tablaPag;				// Tabla de páginas simulada
+
+	int nMarcos; 				// cantidad de marcos.
+	int tamPag; 				// tamaño de las páginas (bytes)
+	int b; 						// nº de bits para el offset
+	unsigned int mask; 			// mascara de bits 
+	int relojAux;				// hace referencia al marco candidato a reemplazar en el "algoritmo del Reloj"
+	bool verbose; 				// Flag para imprimir detalles paso a paso. 1 = activado, 0 = desactivado
+
+	// Lo que se imprime,si verbose == false solo sale esto.
+	long long referencias;		
 	long long fallosPagina;
 	double tasaFallo;
 
 } Sim;
 
-void init_simulacion(int nMarcos, int tamPag, int verbose);
-void process_trace_file(const char *filename); 
-void print_report();
-void cleanup_simulation();
 
-#endif SIMULADOR.H
+// Funciones públicas que se explican mejor en "simulador.c"
+
+void init_simulacion(int nMarcos, int tamPag, bool verbose);
+
+void process_trace_file(const char *filename); 
+
+void imprimir();
+
+void limpiar();
+
+#endif 
