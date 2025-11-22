@@ -3,23 +3,26 @@
 
 static Sim sim;
 
-static void traducir_direccion(unsigned int dv);
+static void traductor_direccion(unsigned int dv);
 static int resolver_fallo(int npv);
-static int obtener_victima();
+static int obtener_candidato();
+
+// dv = dirección virtual
+// df = dirección física
 
 /*
-
+Inicializa la simulación
 */
-void init_simulacion(int nMarcos, int tamPag, bool verbose) {
+void init_simulacion(int nMarcos, int tam, bool verbose) {
     sim.nMarcos = nMarcos;
-    sim.tamPag = tamPag; // def de la tarea PAGE_SIZE = 2^(b) bytes
+    sim.tam = tam; // def de la tarea PAGE_SIZE = 2^(b) bytes
     sim.verbose = verbose;
     sim.relojAux = 0;    
     sim.referencias = 0;
     sim.fallosPagina = 0;
 
-    sim.b = (int)log2(tamPag); // usamos log2 para extraer b 
-    sim.mask = tamPag - 1; // def de la tarea:  MASK = 2b − 1 
+    sim.b = (int)log2(tam); // usamos log2 para extraer b 
+    sim.mask = tam - 1; // def de la tarea:  MASK = 2b − 1 
 
 
     sim.memoriaFisica = (Marco *)malloc(sizeof(Marco) * nMarcos);
@@ -82,7 +85,7 @@ void imprimir() {
 }
 
 /*
-
+Libera memoria.
 */
 void limpiar() {
     if (sim.memoriaFisica) free(sim.memoriaFisica);
@@ -93,20 +96,20 @@ void limpiar() {
 /* 
 
 Algoritmo de Reemplazo para el reloj
-Busca una víctima usando 'relojAux' y el 'refBit'
+Busca un candidato para borrar (aux) usando 'relojAux' y el 'refBit'
 
 */
 
-static int obtener_victima() {
+static int obtener_candidato() {
     while (true) {
         
         Marco *marcoActual = &sim.memoriaFisica[sim.relojAux];
 
        
         if (marcoActual->refBit == 0) {
-            int victima = sim.relojAux;
+            int aux = sim.relojAux;
             sim.relojAux = (sim.relojAux + 1) % sim.nMarcos;
-            return victima;
+            return aux;
         }
         
         marcoActual->refBit = 0;
@@ -115,12 +118,13 @@ static int obtener_victima() {
 }
 
 /*
-
+Fallo de página
 */
 static int resolver_fallo(int npv) {
     sim.fallosPagina++; 
     int marcoDestino = -1;
 
+    // Buscar espacio libre
     for (int i = 0; i < sim.nMarcos; i++) {
         if (sim.memoriaFisica[i].npv == -1) {
             marcoDestino = i;
@@ -128,9 +132,9 @@ static int resolver_fallo(int npv) {
         }
     }
 
-    
+    // Si no hay espacio libre, hacemos espacio con el Algoritmo de Reemplazo
     if (marcoDestino == -1) {
-        marcoDestino = obtener_victima();
+        marcoDestino = obtener_candidato();
         int npv_antiguo = sim.memoriaFisica[marcoDestino].npv;
 
         if (npv_antiguo != -1) {
@@ -139,10 +143,11 @@ static int resolver_fallo(int npv) {
         }
     }
 
-   
+   	// Actualizar datos
+
     sim.tablaPag[npv].valido = true;
     sim.tablaPag[npv].nMarco = marcoDestino;
-    // sim.tablaPag[npv].modificado = false; 
+    // sim.tablaPag[npv].modificado = false; // esto no se usa
     
     sim.memoriaFisica[marcoDestino].npv = npv;
     sim.memoriaFisica[marcoDestino].refBit = 1; 
@@ -151,9 +156,10 @@ static int resolver_fallo(int npv) {
 }
 
 /* 
-
+Traduce la dv a df y verififca si la pág
+esta en memoria (o seqa, HIT) o no (FALLO)
 */
-static void traducir_direccion(unsigned int dv) {
+static void traductor_direccion(unsigned int dv) {
     
     sim.referencias++; 
 
@@ -167,20 +173,20 @@ static void traducir_direccion(unsigned int dv) {
     int marcoUsado = -1;
     const char *estado = "HIT";
 
-
-    if (sim.tablaPag[npv].valido) {
+    // Verifica en la Tabla de Páginas si está presente
+    if (sim.tablaPag[npv].valido) { // Si esta en RAM
  
         marcoUsado = sim.tablaPag[npv].nMarco;
         sim.memoriaFisica[marcoUsado].refBit = 1; 
         estado = "HIT";
 
-    } else {
+    } else { // Si no esta en RAM
      
         marcoUsado = resolver_fallo(npv); 
         estado = "FALLO";
     }
 
-    // Cálculo de la dirección física 
+    // Cálculo de la dirección física (esto sale en la def de la tarea btw)
     unsigned int df = (marcoUsado << sim.b) | offset;
 
     if (sim.verbose) {

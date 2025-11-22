@@ -45,7 +45,7 @@ typedef struct Sim {
 	TdP *tablaPag;				// Tabla de páginas simulada
 
 	int nMarcos; 				// cantidad de marcos.
-	int tamPag; 				// tamaño de las páginas (bytes)
+	int tam; 				// tamaño (bytes)
 	int b; 						// nº de bits para el offset
 	unsigned int mask; 			// mascara de bits 
 	int relojAux;				// hace referencia al marco candidato a reemplazar en el "algoritmo del Reloj"
@@ -61,7 +61,7 @@ typedef struct Sim {
 
 // Funciones públicas que se explican mejor en "simulador.c"
 
-void init_simulacion(int nMarcos, int tamPag, bool verbose);
+void init_simulacion(int nMarcos, int tam, bool verbose);
 
 void process_trace_file(const char *filename); 
 

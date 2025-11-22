@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     }
 
     int nMarcos = atoi(argv[1]);
-    int tamPag = atoi(argv[2]);
+    int tam = atoi(argv[2]);
     
     bool verbose = false; // En caso de no específicar 
     
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Ejecución de la simulación
-    init_simulacion(nMarcos, tamPag, verbose);
+    init_simulacion(nMarcos, tam, verbose);
     process_trace_file(filename);
     imprimir();
     limpiar();
