@@ -59,7 +59,7 @@ void process_trace_file(const char *filename) {
     char linea[256];
     while (fgets(linea, sizeof(linea), fp)) {
         unsigned int dv = (unsigned int)strtoul(linea, NULL, 0);
-        traducir_direccion(dv);
+        traductor_direccion(dv);
     }
     fclose(fp);
 }
