@@ -67,7 +67,7 @@ cat > mini_trace.txt <<EOF
 0x00000006
 0x00000001
 EOF
-# Ejecutamos usando la función para que también genere su CSV
+# tiene su csv aparte
 ejecutar_prueba 3 1 "mini_trace.txt"
 
 
@@ -98,6 +98,6 @@ else
     echo -e "${RED}Error: No se encuentra $TRACE_FILE.${NC}"
 fi
 
-# Limpieza
+
 rm  temp_salida.txt
 echo -e "\n${GREEN} Listo ${NC}"
