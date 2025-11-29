@@ -1,0 +1,8 @@
+Archivo,Marcos,TamPag,Referencias,Fallos,TasaFallo
+mini_trace.txt,3,1,10,9,0.9000
+trace1.txt,8,8,8192,8073,0.9855
+trace1.txt,16,8,8192,7943,0.9696
+trace1.txt,32,8,8192,7713,0.9415
+trace2.txt,8,4096,8192,7649,0.9337
+trace2.txt,16,4096,8192,7138,0.8713
+trace2.txt,32,4096,8192,6142,0.7498
