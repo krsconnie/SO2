@@ -1,20 +1,22 @@
 CC := gcc
 CFLAGS := -std=gnu99 -Wall -Wextra
-LDFLAGS := -pthread -lm
 
-all: barrier sim
+all: barrier simulador
 
 barrier: build/main_barrier.o build/reusable_barrier.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) -o $@ $^ -pthread
 
-sim: build/main_sim.o build/simulador.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+simulador: build/main_sim.o build/simulador.o
+	$(CC) -o $@ $^ -lm
 
 build/%.o: src/%.c | build/
 	$(CC) -o $@ -c $^ $(CFLAGS)
+
+build/reusable_barrier.o: src/reusable_barrier.c
+	$(CC) -o $@ -c $^ $(CFLAGS) -pthread
 
 build/:
 	mkdir -p build
 
 clean:
-	rm -f barrier sim
+	rm -f barrier simulador
